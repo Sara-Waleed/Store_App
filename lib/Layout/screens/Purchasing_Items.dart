@@ -81,9 +81,35 @@ class Purchasing_Items extends StatelessWidget {
                                   Text("Shiny Black",style: TextStyle(
                                       color: Colors.grey
                                   ),),
-                                  ElevatedButton(
-                                      onPressed: (){},
-                                      child: Text("1")),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Container(
+                        height: 35,
+                        width: 35,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.grey
+                        ),
+                        child: Center(child: IconButton(icon: Icon(Icons.add), onPressed: () {  },))),
+                    Container(
+                        height: 40,
+                        width: 40,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+
+                        ),
+                        child: Center(child: Text("1",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 25),))),
+                    Container(
+                        height: 35,
+                        width: 35,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.grey
+                        ),
+                        child: Center(child: IconButton(icon: Icon(Icons.minimize), onPressed: () {  },))),
+                  ],
+                )
                                 ],
                               ),
                             ],
@@ -99,7 +125,9 @@ class Purchasing_Items extends StatelessWidget {
           Expanded(
             flex: 1,
               child: Container(
+                padding: EdgeInsets.only(left: 10,right: 10),
                 decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
                   color: Colors.grey,
                   border: Border.all(color: Colors.white)
                 ),

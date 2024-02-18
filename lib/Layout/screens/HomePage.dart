@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../widgets/HomePage_Widgets/Horizontal_List.dart';
 import '../widgets/HomePage_Widgets/Random_Item_List.dart';
 import '../widgets/HomePage_Widgets/ScrollableImagesWithPoints.dart';
-import '../widgets/HomePage_Widgets/SearchBar.dart';
 import 'Searching_Page.dart';
 
 class HomePage extends StatefulWidget {

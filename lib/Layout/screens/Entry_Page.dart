@@ -19,8 +19,9 @@ class MyApp extends StatelessWidget {
         "login":(context) => LogInScreen(),
         "Register":(context) => RegisterScreen(),
         "home":(context) => HomePage(),
+        "Enterypoint":(context) => MyHomePage(),
       },
-      home: MyHomePage(),
+      home: LogInScreen(),
     );
   }
 }
