@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import '../widgets/Log_In_Button.dart';
-import '../widgets/Log_Register_Widgets/LoG_IN_TextFormField.dart';
+import 'Entry_Page.dart';
 
 
 class LogInScreen extends StatefulWidget {
@@ -14,7 +14,8 @@ class LogInScreen extends StatefulWidget {
 
 class _LogInState extends State<LogInScreen> {
   GlobalKey<FormState> formKey=GlobalKey();
-  String? email,password;
+  final TextEditingController email=TextEditingController();
+  final TextEditingController password=TextEditingController();
   bool isloaded=false;
   @override
   Widget build(BuildContext context) {
@@ -51,19 +52,35 @@ class _LogInState extends State<LogInScreen> {
                             ),),
                           ),
                           SizedBox(height: 10,),
-                          TextFieldLogIn(
-                              hintText: "Email",
-                              onchange: (data){
-                                email=data;
-                              }),
-                          SizedBox(height: 10,),
-
-                          TextFieldLogIn(
-                              obscureText: true,
-                              hintText: "Password",
-                              onchange: (data){
-                                password=data;
-                              }),
+                          TextFormField(
+                            controller: email,
+                            keyboardType: TextInputType.emailAddress,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter your email';
+                              }
+                              return null;
+                            },
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(),
+                              labelText: 'Email',
+                            ),
+                          ),
+                          SizedBox(height: 20),
+                          TextFormField(
+                            controller: password,
+                            obscureText: true,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter your password';
+                              }
+                              return null;
+                            },
+                            decoration: InputDecoration(
+                              labelText: 'Password',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
 
                           SizedBox(height: 10,),
                           Row(
@@ -82,35 +99,32 @@ class _LogInState extends State<LogInScreen> {
                             ],
                           ),
                         SizedBox(height: 30,),
+                         // Spacer(flex: 1,),
                           Center(
                             child: buttonItem(
-                              text: "LogIn",
+                              text: "Login",
                               ontap: () async {
                                 if (formKey.currentState!.validate()) {
-                                  isloaded = true;
-                                  setState(() {});
+                                  setState(() {
+                                    isloaded = true;
+                                  });
                                   try {
-                                    await LogInAccount();
-                                    Navigator.of(context).pushNamed("Enterypoint", arguments: email);
-                                  } on FirebaseAuthException catch (e) {
-                                    if (e.code == "User_Not_Found") {
-                                      showingSnapBar(context, "The password provided is too weak.");
-                                    } else if (e.code == 'email-already-in-use') {
-                                      showingSnapBar(context, "The account already exists for that email.");
-                                    }
+                                    await login();
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => MyHomePage()));
                                   } catch (error) {
-                                    showingSnapBar(context, "An error occurred. Please try again later.");
+                                    setState(() {
+                                      isloaded = false;
+                                    });
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text("An error occurred. Please try again later."),
+                                      ),
+                                    );
                                   }
-                                  isloaded=false;
-                                  setState(() {});
-                                }else{}
+                                }
                               },
-                              // Disable button when isloaded is true
                             ),
                           ),
-
-                          // Spacer(flex: 1,),
-
                         ],
                       ),
                     ),
@@ -124,18 +138,23 @@ class _LogInState extends State<LogInScreen> {
     );
 
   }
-  Future<void> LogInAccount() async {
-    await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: email!,
-      password: password!,
-    );
-  }
-
-
-  void showingSnapBar(BuildContext context,String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content:
-      Text(message),),);
-  }
+  // Future<void> LogInAccount() async {
+  //   await FirebaseAuth.instance.signInWithEmailAndPassword(
+  //     email: email!,
+  //     password: password!,
+  //   );
+  // }
+  //
+  //
+  // void showingSnapBar(BuildContext context,String message) {
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(content:
+  //     Text(message),),);
+  // }
+  Future<void> login() async {
+    final String emaill = email.text.trim();
+    final String passwordd = password.text.trim();
+    await FirebaseAuth.instance.signInWithEmailAndPassword(email: emaill, password: passwordd);
+    }
 }
 

@@ -1,9 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
-
-import '../widgets/Log_In_Button.dart';
-import '../widgets/Log_Register_Widgets/LoG_IN_TextFormField.dart';
+import 'Entry_Page.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -14,19 +12,20 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   GlobalKey<FormState> formKey=GlobalKey();
-  String? email,password;
+  final TextEditingController  email =TextEditingController();
+  final TextEditingController password=TextEditingController();
   bool isloaded=false;
   @override
   Widget build(BuildContext context) {
 
-    return Scaffold(
-      resizeToAvoidBottomInset: true,
-      backgroundColor: Colors.white,
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: SingleChildScrollView(
-          child: ModalProgressHUD(
-            inAsyncCall: isloaded,
+    return ModalProgressHUD(
+      inAsyncCall: isloaded,
+      child: Scaffold(
+        resizeToAvoidBottomInset: true,
+        backgroundColor: Colors.white,
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: SingleChildScrollView(
             child: Form(
               key: formKey,
               child: Column(
@@ -58,19 +57,35 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         //       email=data;
                         //     }),
                         SizedBox(height: 10,),
-                        TextFieldLogIn(
-                            hintText: "Email",
-                            onchange: (data){
-                              email=data;
-                            }),
-                        SizedBox(height: 10,),
-
-                        TextFieldLogIn(
-                            obscureText: true,
-                            hintText: "Password",
-                            onchange: (data){
-                              password=data;
-                            }),
+                        TextFormField(
+                          controller: email,
+                          keyboardType: TextInputType.emailAddress,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your email';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Email',
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        TextFormField(
+                          controller: password,
+                          obscureText: true,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your password';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            labelText: 'Password',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
 
                         SizedBox(height: 10,),
                         Row(
@@ -92,29 +107,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         // Spacer(flex: 1,),
                       SizedBox(height: 20,),
                         Center(
-                          child: buttonItem(
-                            text: "Register",
-                            ontap: () async {
-                              if (formKey.currentState!.validate()) {
-                                isloaded = true;
-                                setState(() {});
-                                try {
-                                  await registerUser();
-                                  Navigator.of(context).pushNamed("login", arguments: email);
-                                } on FirebaseAuthException catch (e) {
-                                  if (e.code == "User_Not_Found") {
-                                    showingSnapBar(context, "The password provided is too weak.");
-                                  } else if (e.code == 'email-already-in-use') {
-                                    showingSnapBar(context, "The account already exists for that email.");
-                                  }
-                                } catch (error) {
-                                  showingSnapBar(context, "An error occurred. Please try again later.");
-                                }
-                                isloaded=false;
-                                setState(() {});
-                              }else{}
-                            },
-                            // Disable button when isloaded is true
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.black
+                            ),
+                            onPressed: isloaded ? null : _register,
+                            child: isloaded
+                                ? CircularProgressIndicator()
+                                : Text('Register'),
                           ),
                         ),
                       ],
@@ -124,19 +124,76 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ),
         ),
+
+
       ),
+    );
+  }
+  Future<void> _register() async {
+    if (formKey.currentState!.validate()) {
+      setState(() {
+        isloaded = true;
+      });
+      try {
+        UserCredential userCredential = await FirebaseAuth.instance
+            .createUserWithEmailAndPassword(
+          email: email.text.trim(),
+          password: password.text.trim(),
+        );
+        // Registration successful
+        // You can navigate to another screen or show a success message
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MyHomePage(),));
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'weak-password') {
+          _showErrorDialog('The password provided is too weak.');
+        } else if (e.code == 'email-already-in-use') {
+          _showErrorDialog('The account already exists for that email.');
+        } else {
+          _showErrorDialog('Error: ${e.message}');
+        }
+      } catch (e) {
+        _showErrorDialog('Error: $e');
+      } finally {
+        setState(() {
+          isloaded = false;
+        });
+      }
+    }
+  }
 
-
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Error'),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
     );
   }
 
-  Future<void> registerUser() async {
-    UserCredential user = await FirebaseAuth.instance
-        .createUserWithEmailAndPassword(email: email!, password: password!);
+  @override
+  void dispose() {
+    email.dispose();
+    password.dispose();
+    super.dispose();
   }
-  void showingSnapBar(BuildContext context,String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content:
-      Text(message),),);
-  }
+  // Future<void> registerUser() async {
+  //   UserCredential user = await FirebaseAuth.instance
+  //       .createUserWithEmailAndPassword(email: email!, password: password!);
+  // }
+  // void showingSnapBar(BuildContext context,String message) {
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(content:
+  //     Text(message),),);
+  // }
 }

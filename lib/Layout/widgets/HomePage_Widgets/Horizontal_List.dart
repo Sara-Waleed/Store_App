@@ -44,32 +44,32 @@ class Horizontal_List extends StatelessWidget {
                 children: List.generate(
                   10,
                       (index) => Padding(
-                        padding: const EdgeInsets.only(right: 5.0,left:5),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(25),
-                                color: Colors.blue,
-                              ),
-                              height: 50,
-                              width: 50,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(25),
-                                child: Image.asset(
-                                    "assets/item.jpg",fit: BoxFit.fill,
-                                  // Ensure the image fills the circular shape
-                                ),
-                              ),
+                    padding: const EdgeInsets.only(right: 5.0,left:5),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(25),
+                            color: Colors.blue,
+                          ),
+                          height: 50,
+                          width: 50,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(25),
+                            child: Image.asset(
+                              "assets/item.jpg",fit: BoxFit.fill,
+                              // Ensure the image fills the circular shape
                             ),
-                            SizedBox(height: 5,),
-
-                            Text("item"),
-                          ],
+                          ),
                         ),
-                      ),
+                        SizedBox(height: 5,),
+
+                        Text("item"),
+                      ],
+                    ),
+                  ),
 
                 ),
               ),
